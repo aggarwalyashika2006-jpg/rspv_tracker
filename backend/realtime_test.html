@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Real-Time RSVP Test</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 250px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #eee;
+        }
+
+        #messages {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            min-height: 150px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Real-Time RSVP Test</h1>
+
+    <p>
+        Enter the Event ID and connect.
+    </p>
+
+    <input
+        type="number"
+        id="eventId"
+        placeholder="Event ID"
+        value="1"
+    >
+
+    <button onclick="connectWebSocket()">
+        Connect
+    </button>
+
+    <div id="status">
+        Not connected
+    </div>
+
+    <div id="messages">
+        Waiting for RSVP updates...
+    </div>
+
+    <script>
+
+        let socket = null;
+
+        function connectWebSocket() {
+
+            const eventId =
+                document.getElementById("eventId").value;
+
+            if (!eventId) {
+
+                alert("Please enter an Event ID.");
+
+                return;
+            }
+
+            const protocol =
+                window.location.protocol === "https:"
+                    ? "wss"
+                    : "ws";
+
+            const host =
+                window.location.hostname === ""
+                    ? "127.0.0.1:8000"
+                    : window.location.host;
+
+            const url =
+                `${protocol}://${host}/ws/events/${eventId}`;
+
+            socket = new WebSocket(url);
+
+            socket.onopen = function () {
+
+                document.getElementById("status").innerText =
+                    "🟢 Connected to real-time server";
+
+                document.getElementById("messages").innerHTML =
+                    "Waiting for RSVP updates...";
+            };
+
+            socket.onmessage = function (event) {
+
+                const data =
+                    JSON.parse(event.data);
+
+                document.getElementById("messages").innerHTML =
+                    `
+                    <h3>Live RSVP Update</h3>
+
+                    <p>
+                        <strong>Going:</strong>
+                        ${data.going ?? 0}
+                    </p>
+
+                    <p>
+                        <strong>Maybe:</strong>
+                        ${data.maybe ?? 0}
+                    </p>
+
+                    <p>
+                        <strong>Not Going:</strong>
+                        ${data.not_going ?? 0}
+                    </p>
+                    `;
+            };
+
+            socket.onclose = function () {
+
+                document.getElementById("status").innerText =
+                    "🔴 WebSocket disconnected";
+            };
+
+            socket.onerror = function () {
+
+                document.getElementById("status").innerText =
+                    "⚠️ WebSocket connection error";
+            };
+        }
+
+    </script>
+
+</body>
+
+</html>
