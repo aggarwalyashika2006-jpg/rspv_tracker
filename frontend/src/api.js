@@ -225,7 +225,14 @@ export async function updateEvent(
     }
   );
 }
-
+export async function cancelEvent(id) {
+  return request(
+    `/api/events/${id}`,
+    {
+      method: "DELETE"
+    }
+  );
+}
 
 export async function deleteEvent(
   eventId
