@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getEvents } from "./api";
 
 import Login from "./pages/Login";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
