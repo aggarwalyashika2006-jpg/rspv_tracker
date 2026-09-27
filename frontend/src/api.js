@@ -364,7 +364,7 @@ export function createWebSocket(
 
   const websocket =
     new WebSocket(
-      `ws://127.0.0.1:8000/ws/events/${eventId}`
+      wss://real-time-cloud-event-rsvp-tracker-tas4.onrender.com
     );
 
   websocket.onopen = () => {
